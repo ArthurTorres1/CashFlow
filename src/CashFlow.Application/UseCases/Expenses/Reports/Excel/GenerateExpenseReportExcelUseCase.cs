@@ -1,4 +1,5 @@
 ﻿using CashFlow.Domain.Enums;
+using CashFlow.Domain.Extensions;
 using CashFlow.Domain.Reports;
 using CashFlow.Domain.Repositories.Expenses;
 using ClosedXML.Excel;
@@ -38,7 +39,7 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Excel
                 worksheet.Cell($"A{raw}").Value = expense.Title;
                 worksheet.Cell($"B{raw}").Value = expense.Description;
                 worksheet.Cell($"C{raw}").Value = expense.Date;
-                worksheet.Cell($"D{raw}").Value = ConvertPayment_Type(expense.PaymentType);
+                worksheet.Cell($"D{raw}").Value = expense.PaymentType.PaymentTypeToString();
                 worksheet.Cell($"E{raw}").Value = expense.Amount;
                 worksheet.Cell($"E{raw}").Style.NumberFormat.Format = $"-{CURRENCY_SYMBOL} #,##0.00";
 
@@ -51,18 +52,6 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Excel
             workbook.SaveAs(file);
 
             return file.ToArray();
-        }
-
-        private string ConvertPayment_Type(PaymentType payment)
-        {
-            return payment switch
-            {
-                PaymentType.Cash => "Dinheiro",
-                PaymentType.CreditCard => "Cartão de crédito",
-                PaymentType.DebitCard => "Cartão de débito",
-                PaymentType.EletronicTransfer => "Transferência eletrônica",
-                _ => string.Empty
-            };
         }
 
         private void InsertHeader(IXLWorksheet worksheet)
