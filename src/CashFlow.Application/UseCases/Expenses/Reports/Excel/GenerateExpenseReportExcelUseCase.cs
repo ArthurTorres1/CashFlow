@@ -8,6 +8,7 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Excel
     public class GenerateExpenseReportExcelUseCase : IGenerateExpenseReportExcelUseCase
     {
         private const string CURRENCY_SYMBOL = "R$";
+
         private readonly IExpensesReadOnlyRepository _repository;
         public GenerateExpenseReportExcelUseCase(IExpensesReadOnlyRepository repository)
         {
@@ -20,7 +21,7 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Excel
                 return [];
 
             using var workbook = new XLWorkbook();
-            workbook.Author = "ArthurTorre/CashFlow";
+            workbook.Author = "ArthurTorres/CashFlow";
             workbook.Style.Font.FontSize = 12;
             workbook.Style.Font.FontName = "Times New Roman";
 
