@@ -147,4 +147,7 @@
   <data name="NAME_EMPTY" xml:space="preserve">
     <value>Le nom ne peut pas être vide.</value>
   </data>
+  <data name="EMAIL_OR_PASSWORD_INVALID" xml:space="preserve">
+    <value>L’adresse e-mail ou le mot de passe ne sont pas valides.</value>
+  </data>
 </root>

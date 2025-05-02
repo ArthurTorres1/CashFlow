@@ -7,6 +7,7 @@ using CashFlow.Domain.Repositories.Users;
 using CashFlow.Domain.Security;
 using CashFlow.Exception;
 using CashFlow.Exception.ExceptionsBase;
+using CashFlow.Infrastructure.Security.Tokens;
 using FluentValidation.Results;
 
 namespace CashFlow.Application.UseCases.Users.Register
@@ -18,34 +19,38 @@ namespace CashFlow.Application.UseCases.Users.Register
         private readonly IUsersWriteOnlyRepository _repositoryWriteOnly;
         private readonly IUserReadOnlyRepository _repositoryReadOnly;
         private readonly IPasswordEncrypter _passwordEncrypter;
+        private readonly IAccessTokenGenerator _tokenGenerator;
 
         public RegisterUserUseCase(
             IMapper mapper,
             IUnitOfWork unitOfWork,
             IUsersWriteOnlyRepository repositoryWriteOnly,
             IUserReadOnlyRepository repositoryReadOnly,
-            IPasswordEncrypter passwordEncrypter)
+            IPasswordEncrypter passwordEncrypter,
+            IAccessTokenGenerator accessTokenGenerator)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _repositoryWriteOnly = repositoryWriteOnly;
             _repositoryReadOnly = repositoryReadOnly;
             _passwordEncrypter = passwordEncrypter;
+            _tokenGenerator = accessTokenGenerator;
         }
         public async Task<ResponseRegisteredUserJson> Execute(RequestRegisterUserJson request)
         {
             await Validate(request);
 
-            var entity = _mapper.Map<User>(request);
-            entity.Password = _passwordEncrypter.Encrypt(request.Password);
-            entity.User_identifier = Guid.NewGuid();
+            var user = _mapper.Map<User>(request);
+            user.Password = _passwordEncrypter.Encrypt(request.Password);
+            user.User_identifier = Guid.NewGuid();
 
-            await _repositoryWriteOnly.Add(entity);
+            await _repositoryWriteOnly.Add(user);
             await _unitOfWork.Commit();
 
             return new ResponseRegisteredUserJson
             {
-                Name = entity.Name
+                Name = user.Name,
+                Token = _tokenGenerator.Generate(user)
             };
         }
 
